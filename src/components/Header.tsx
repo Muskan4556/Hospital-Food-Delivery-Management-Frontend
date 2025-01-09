@@ -3,7 +3,7 @@ import { useAppContext } from "@/context/useAppContext";
 import { Link, useNavigate } from "react-router-dom";
 
 const Header = () => {
-  const { isLoggedIn, validateToken } = useAppContext();
+  const { isLoggedIn, validateToken, userRole } = useAppContext();
   const { logoutUser } = useLogout();
   const navigate = useNavigate();
 
@@ -23,11 +23,14 @@ const Header = () => {
         </div>
         <nav className="space-x-6">
           {isLoggedIn ? (
-            <div
-              onClick={handleLogout}
-              className="hover:text-gray-200 hover:underline font-semibold cursor-pointer md:text-lg"
-            >
-              Logout
+            <div className="flex items-center space-x-4">
+              <div className="font-semibold cursor-pointer md:text-lg">{userRole}</div>
+              <div
+                onClick={handleLogout}
+                className="hover:text-gray-200 hover:underline font-semibold cursor-pointer md:text-lg"
+              >
+                Logout
+              </div>
             </div>
           ) : (
             <>

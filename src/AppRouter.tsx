@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import Layout from "./layout/Layout";
 import AuthPage from "./pages/AuthPage";
+import Dashboard from "./components/Dashboard";
 
 const AppRouter = () => {
   return (
@@ -9,7 +10,7 @@ const AppRouter = () => {
         path="/"
         element={
           <Layout>
-            <div>Home Page</div>
+            <Dashboard />
           </Layout>
         }
       />
