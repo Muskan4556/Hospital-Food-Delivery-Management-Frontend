@@ -23,19 +23,17 @@ import { useCreatePatient } from "@/api/patient";
 import { useState } from "react";
 
 const patientSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  dob: z.string().min(1, "Date of birth is required"),
+  name: z.string().optional(),
+  dob: z.string().optional(),
   diseases: z.array(z.string()).optional(),
   allergies: z.array(z.string()).optional(),
-  roomNumber: z.string().min(1, "Room number is required"),
-  bedNumber: z.string().min(1, "Bed number is required"),
-  floorNumber: z.string().min(1, "Floor number is required"),
-  age: z.number().min(1, "Age is required").positive("Age must be positive"),
-  gender: z.enum(["Male", "Female", "Other"], {
-    required_error: "Gender is required",
-  }),
+  roomNumber: z.string().optional(),
+  bedNumber: z.string().optional(),
+  floorNumber: z.string().optional(),
+  age: z.number().optional(),
+  gender: z.enum(["Male", "Female", "Other"]).optional(),
   contactInfo: z.object({
-    phone: z.string().min(1, "Phone number is required"),
+    phone: z.string().optional(),
     email: z.string().optional(),
   }),
   emergencyContact: z
@@ -55,9 +53,9 @@ type PatientFormProps = {
   refetch: () => void;
 };
 
-export const PatientForm = ({ entityType, refetch }: PatientFormProps) => {
+export const PatientEditForm = ({ entityType, refetch }: PatientFormProps) => {
   const { createPatient } = useCreatePatient();
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(true); 
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(true);
 
   const form = useForm<PatientFormData>({
     resolver: zodResolver(patientSchema),

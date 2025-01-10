@@ -1,17 +1,24 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./layout/Layout";
 import AuthPage from "./pages/AuthPage";
 import Dashboard from "./components/Dashboard";
+import { useAppContext } from "./context/useAppContext";
 
 const AppRouter = () => {
+  const { isLoggedIn } = useAppContext();
+
   return (
     <Routes>
       <Route
         path="/"
         element={
-          <Layout>
-            <Dashboard />
-          </Layout>
+          isLoggedIn ? (
+            <Layout>
+              <Dashboard />
+            </Layout>
+          ) : (
+            <Navigate to="/auth/login" />
+          )
         }
       />
       <Route

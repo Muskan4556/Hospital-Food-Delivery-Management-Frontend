@@ -24,7 +24,7 @@ const Dashboard = () => {
         </h1>
         <Badge variant="outline" className="text-sm">
           <Clock className="w-4 h-4 mr-1" />
-          {new Date().toLocaleTimeString()}
+          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </Badge>
       </div>
 
