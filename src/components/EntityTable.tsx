@@ -95,10 +95,11 @@ export const EntityTable = ({ entityType, data, columns, refetch }: Props) => {
       <CardContent>
         <Table>
           <TableHeader>
-            <TableRow>
-              {columns.map((column) => (
+          <TableRow>
+              {columns.map((column: string) => (
                 <TableHead key={column}>{column}</TableHead>
               ))}
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

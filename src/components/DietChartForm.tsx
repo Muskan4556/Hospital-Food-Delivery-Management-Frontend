@@ -57,7 +57,7 @@ export const DietChartForm = ({
 
   const defaultValues = selectedDiet
     ? {
-        patientId: selectedDiet.patientId,
+        patientId: selectedDiet.patientId.toString(),
         morningMeal: selectedDiet.morningMeal,
         eveningMeal: selectedDiet.eveningMeal,
         nightMeal: selectedDiet.nightMeal,

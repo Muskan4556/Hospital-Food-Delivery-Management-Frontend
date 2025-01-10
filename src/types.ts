@@ -35,3 +35,12 @@ export type TDietChart = {
   createdAt?: string;
   updatedAt?: string;
 };
+
+export type TPantryStaff= {
+  name: string;
+  contactInfo: {
+    phone?: string;
+    email?: string;
+  };
+  location: string;
+};

@@ -6,29 +6,32 @@ import { useGetAllPatients } from "@/api/patient";
 import { EntityTable } from "./EntityTable";
 import { useGetAllDietCharts } from "@/api/diet-chart";
 import { EntityTableDietChart } from "./EntityTableDietChart";
+import Loader from "./Loader";
+import { useGetAllPantryStaff } from "@/api/pantry-Staff";
+import { EntityTablePantryStaff } from "./EntityTablePantryStaff";
 
 const Dashboard = () => {
-  const { patients, isLoading, error, refetch } = useGetAllPatients();
+  const { patients, isLoading, refetch } = useGetAllPatients();
   const {
     dietCharts,
     isLoading: isLoadingDiet,
     refetch: refetchDietCharts,
   } = useGetAllDietCharts();
 
-  if (isLoading || isLoadingDiet) {
-    return <div>Loading...</div>;
-  }
+  const {
+    pantryStaff,
+    isLoading: isLoadingPantryStaff,
+    refetch: refetchPantryStaff,
+  } = useGetAllPantryStaff();
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
+  if (isLoading || isLoadingDiet || isLoadingPantryStaff) {
+    return <Loader />;
   }
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen rounded-lg">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">
-          Hospital Food Management Dashboard
-        </h1>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
         <Badge variant="outline" className="text-sm">
           <Clock className="w-4 h-4 mr-1" />
           {new Date().toLocaleTimeString([], {
@@ -38,7 +41,7 @@ const Dashboard = () => {
         </Badge>
       </div>
 
-      <Tabs defaultValue="patients" className="space-y-4 px-">
+      <Tabs defaultValue="diet-charts" className="space-y-4 px-">
         <TabsList>
           <TabsTrigger value="patients">
             <Users className="w-4 h-4 mr-2" />
@@ -48,9 +51,9 @@ const Dashboard = () => {
             <ChefHat className="w-4 h-4 mr-2" />
             Diet Charts
           </TabsTrigger>
-          <TabsTrigger value="staff">
+          <TabsTrigger value="pantry-staff">
             <Users className="w-4 h-4 mr-2" />
-            Staff
+            Pantry Staff
           </TabsTrigger>
           <TabsTrigger value="meals">
             <Utensils className="w-4 h-4 mr-2" />
@@ -87,6 +90,7 @@ const Dashboard = () => {
               refetch={refetchDietCharts}
               data={dietCharts}
               columns={[
+                "Patient Id",
                 "Patient Name",
                 "Morning Meal",
                 "Evening Meal",
@@ -94,6 +98,16 @@ const Dashboard = () => {
                 "Ingredients",
                 "Instructions",
               ]}
+            />
+          </TabsContent>
+        )}
+        {pantryStaff && (
+          <TabsContent value="pantry-staff">
+            <EntityTablePantryStaff
+              entityType="Pantry Staff"
+              refetch={refetchPantryStaff}
+              data={pantryStaff}
+              columns={["Staff Name", "Phone", "Email", "Location"]}
             />
           </TabsContent>
         )}

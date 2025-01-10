@@ -23,6 +23,8 @@ import { DietChartForm } from "./DietChartForm";
 
 const columnRenderers = {
   // @ts-expect-error: Expect an error on the next line
+  "Patient Id": (item: TDietChart) => item.patientId._id.toString() || "N/A",
+  // @ts-expect-error: Expect an error on the next line
   "Patient Name": (item: TDietChart) => item.patientId.name || "N/A",
   "Morning Meal": (item: TDietChart) => item.morningMeal || "N/A",
   "Evening Meal": (item: TDietChart) => item.eveningMeal || "N/A",
@@ -57,8 +59,6 @@ export const EntityTableDietChart = ({
     null
   );
   const { deleteDietChart } = useDeleteDietChart();
-
-  console.log(data);
 
   const openCreateDialog = () => {
     setSelectedDietChart(null);
@@ -109,6 +109,7 @@ export const EntityTableDietChart = ({
               {columns.map((column: string) => (
                 <TableHead key={column}>{column}</TableHead>
               ))}
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -145,7 +146,7 @@ export const EntityTableDietChart = ({
                   </Dialog>
 
                   <Button
-                   // @ts-expect-error: Expect an error on the next line
+                    // @ts-expect-error: Expect an error on the next line
                     onClick={() => handleDeleteDietChart(item._id)}
                     variant="outline"
                     className="hover:bg-red-600 hover:text-white"
