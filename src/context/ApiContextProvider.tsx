@@ -8,6 +8,7 @@ export type AppContextType = {
   status: "idle" | "pending" | "error" | "success";
   error: Error | null;
   userRole: string | null;
+  loading: boolean;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -19,8 +20,9 @@ type ContextProviderProps = {
 export const AppContextProvider = ({ children }: ContextProviderProps) => {
   const { validateToken: validateTokenApi } = useValidateToken();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Track loading state
 
   const {
     mutateAsync: validateToken,
@@ -32,16 +34,31 @@ export const AppContextProvider = ({ children }: ContextProviderProps) => {
     onSuccess: (data) => {
       setIsLoggedIn(true);
       setUserRole(data.userRole);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userRole", data.userRole);
+      setLoading(false); // Set loading to false after successful validation
     },
     onError: () => {
       setIsLoggedIn(false);
       setUserRole(null);
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("userRole");
+      setLoading(false); 
       reset();
     },
   });
 
   useEffect(() => {
-    validateToken().catch(() => {});
+    const storedLoginStatus = localStorage.getItem("isLoggedIn");
+    const storedUserRole = localStorage.getItem("userRole");
+
+    if (storedLoginStatus === "true") {
+      setIsLoggedIn(true);
+      setUserRole(storedUserRole);
+      validateToken().catch(() => {});
+    } else {
+      setLoading(false); 
+    }
   }, [validateToken]);
 
   return (
@@ -52,6 +69,7 @@ export const AppContextProvider = ({ children }: ContextProviderProps) => {
         validateToken,
         status,
         error,
+        loading, 
       }}
     >
       {children}

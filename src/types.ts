@@ -20,3 +20,18 @@ export type TPatient = {
   createdAt?: Date;
   updatedAt?: Date;
 };
+
+export type TDietChart = {
+  _id?: string;
+  patientId: string;
+  morningMeal: string;
+  eveningMeal: string;
+  nightMeal: string;
+  ingredients: {
+    ingredient: string;
+    quantity: string;
+  }[];
+  instructions?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+};

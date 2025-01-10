@@ -4,11 +4,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Clock, ChefHat, Utensils } from "lucide-react";
 import { useGetAllPatients } from "@/api/patient";
 import { EntityTable } from "./EntityTable";
+import { useGetAllDietCharts } from "@/api/diet-chart";
+import { EntityTableDietChart } from "./EntityTableDietChart";
 
 const Dashboard = () => {
   const { patients, isLoading, error, refetch } = useGetAllPatients();
+  const {
+    dietCharts,
+    isLoading: isLoadingDiet,
+    refetch: refetchDietCharts,
+  } = useGetAllDietCharts();
 
-  if (isLoading) {
+  if (isLoading || isLoadingDiet) {
     return <div>Loading...</div>;
   }
 
@@ -24,12 +31,15 @@ const Dashboard = () => {
         </h1>
         <Badge variant="outline" className="text-sm">
           <Clock className="w-4 h-4 mr-1" />
-          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </Badge>
       </div>
 
       <Tabs defaultValue="patients" className="space-y-4 px-">
-      <TabsList>
+        <TabsList>
           <TabsTrigger value="patients">
             <Users className="w-4 h-4 mr-2" />
             Patients
@@ -65,6 +75,24 @@ const Dashboard = () => {
                 "Diseases",
                 "Allergies",
                 "Emergency Contact",
+              ]}
+            />
+          </TabsContent>
+        )}
+
+        {dietCharts && (
+          <TabsContent value="diet-charts">
+            <EntityTableDietChart
+              entityType="Diet Chart"
+              refetch={refetchDietCharts}
+              data={dietCharts}
+              columns={[
+                "Patient Name",
+                "Morning Meal",
+                "Evening Meal",
+                "Night Meal",
+                "Ingredients",
+                "Instructions",
               ]}
             />
           </TabsContent>

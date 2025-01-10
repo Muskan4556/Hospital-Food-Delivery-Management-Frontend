@@ -5,7 +5,11 @@ import Dashboard from "./components/Dashboard";
 import { useAppContext } from "./context/useAppContext";
 
 const AppRouter = () => {
-  const { isLoggedIn } = useAppContext();
+  const { isLoggedIn, loading } = useAppContext();
+
+  if (loading) {
+    return <div>Loading...</div>; // You can show a loading spinner or some UI here
+  }
 
   return (
     <Routes>
@@ -29,7 +33,6 @@ const AppRouter = () => {
           </Layout>
         }
       />
-
       <Route
         path="/auth/login"
         element={

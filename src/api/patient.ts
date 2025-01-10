@@ -99,7 +99,6 @@ export const useGetAllPatients = () => {
       throw new Error("Error fetching patients");
     }
     const data = await response.json();
-    console.log(data);
 
     return data;
   };
