@@ -1,9 +1,9 @@
 export type TPatient = {
-  _id: string;
+  _id?: string;
   name: string;
   dob: Date;
-  diseases: string[];
-  allergies: string[];
+  diseases?: string[];
+  allergies?: string[];
   roomNumber: string;
   bedNumber: string;
   floorNumber: string;

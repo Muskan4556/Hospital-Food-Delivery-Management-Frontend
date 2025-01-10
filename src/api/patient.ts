@@ -108,6 +108,7 @@ export const useGetAllPatients = () => {
     data: patients,
     isLoading,
     error,
+    refetch
   } = useQuery({
     queryKey: ["patients"],
     queryFn: fetchPatients,
@@ -117,7 +118,7 @@ export const useGetAllPatients = () => {
     toast.error(error.toString());
   }
 
-  return { patients, isLoading, error };
+  return { patients, isLoading, error, refetch };
 };
 
 export const useDeletePatient = () => {

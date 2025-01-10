@@ -1,19 +1,12 @@
-import { useState } from "react";
-
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { Users, Clock } from "lucide-react";
+import { Users, Clock, ChefHat, Utensils } from "lucide-react";
 import { useGetAllPatients } from "@/api/patient";
 import { EntityTable } from "./EntityTable";
 
-
 const Dashboard = () => {
-  const [selectedEntity, setSelectedEntity] = useState(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [formMode, setFormMode] = useState("create");
-
-  const { patients, isLoading, error } = useGetAllPatients();
+  const { patients, isLoading, error, refetch } = useGetAllPatients();
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -36,31 +29,46 @@ const Dashboard = () => {
       </div>
 
       <Tabs defaultValue="patients" className="space-y-4 px-">
-        <TabsList>
+      <TabsList>
           <TabsTrigger value="patients">
             <Users className="w-4 h-4 mr-2" />
             Patients
           </TabsTrigger>
+          <TabsTrigger value="diet-charts">
+            <ChefHat className="w-4 h-4 mr-2" />
+            Diet Charts
+          </TabsTrigger>
+          <TabsTrigger value="staff">
+            <Users className="w-4 h-4 mr-2" />
+            Staff
+          </TabsTrigger>
+          <TabsTrigger value="meals">
+            <Utensils className="w-4 h-4 mr-2" />
+            Meals
+          </TabsTrigger>
         </TabsList>
 
-       {patients && <TabsContent value="patients">
-          <EntityTable
-            entityType="patient"
-            data={patients}
-            columns={[
-              "Name",
-              "Age",
-              "Gender",
-              "Room Number",
-              "Bed Number",
-              "Floor Number",
-              "Contact Info",
-              "Diseases",
-              "Allergies",
-              "Emergency Contact",
-            ]}
-          />
-        </TabsContent>}
+        {patients && (
+          <TabsContent value="patients">
+            <EntityTable
+              entityType="patient"
+              refetch={refetch}
+              data={patients}
+              columns={[
+                "Name",
+                "Age",
+                "Gender",
+                "Room Number",
+                "Bed Number",
+                "Floor Number",
+                "Contact Info",
+                "Diseases",
+                "Allergies",
+                "Emergency Contact",
+              ]}
+            />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

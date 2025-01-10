@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -14,15 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { PatientForm } from "./PaitentForm";
 import { TPatient } from "@/types";
-import { ScrollArea } from "./ui/scroll-area";
 
 type Props = {
   entityType: string;
   data: TPatient[];
   columns: string[];
+  refetch: () => void;
 };
 
 const columnRenderers = {
@@ -42,7 +40,7 @@ const columnRenderers = {
       .join(", ") || "None",
 };
 
-export const EntityTable = ({ entityType, data, columns }: Props) => {
+export const EntityTable = ({ entityType, data, columns, refetch }: Props) => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -50,60 +48,39 @@ export const EntityTable = ({ entityType, data, columns }: Props) => {
           <CardTitle className="capitalize">{entityType}</CardTitle>
           <CardDescription>Manage {entityType} records</CardDescription>
         </div>
-        <Button
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add {entityType}
-        </Button>
-      </CardHeader>
-      <CardContent>
-        {/* Add scrolling and some padding for mobile devices */}
-        <div className="overflow-x-auto px-2 py-3">
-          <Table className="min-w-full table-auto">
-            <TableHeader>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableHead key={column} className="text-sm p-2">
-                    {column}
-                  </TableHead>
-                ))}
-                <TableHead className="text-sm p-2">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((item) => (
-                <TableRow key={item._id}>
-                  {columns.map((column) => (
-                    <TableCell
-                      key={`${item._id}-${column}`}
-                      className="p-2 text-sm"
-                    >
-                      {columnRenderers[column as keyof typeof columnRenderers]
-                        ? columnRenderers[
-                            column as keyof typeof columnRenderers
-                          ](item)
-                        : "-"}
-                    </TableCell>
-                  ))}
-                  <TableCell className="p-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setFormMode("edit");
-                        setSelectedEntity(item);
-                        setIsFormOpen(true);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <div className="relative">
+          <PatientForm entityType={entityType} refetch={refetch} />
         </div>
+      </CardHeader>
+
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {columns.map((column) => (
+                <TableHead key={column}>{column}</TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((item) => (
+              <TableRow key={item._id}>
+                {columns.map((column) => (
+                  <TableCell key={column}>
+                    {columnRenderers[column as keyof typeof columnRenderers]
+                      ? columnRenderers[column as keyof typeof columnRenderers](
+                          item
+                        )
+                      : ""}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );
 };
+
+export default EntityTable;
