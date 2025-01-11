@@ -35,13 +35,14 @@ import { ChefHat, Edit, Plus, Trash2 } from "lucide-react";
 import { PantryStaffForm } from "./PantryStaffForm";
 import { useGetAllDietCharts } from "@/api/diet-chart";
 import { useCreateMeal } from "@/api/mealPreparation";
+import { useQueryClient } from "@tanstack/react-query";
 
 const columnRenderers = {
   Name: (item: TPantryStaff) => item.name || "N/A",
   "Contact Info": (item: TPantryStaff) => (
-    <div>
-      <div>{item.contactInfo?.phone || "N/A"}</div>
+    <div className="space-y-2">
       <div>{item.contactInfo?.email || "N/A"}</div>
+      <div>{item.contactInfo?.phone || "N/A"}</div>
     </div>
   ),
   Location: (item: TPantryStaff) => item.location || "N/A",
@@ -60,13 +61,16 @@ export const EntityTablePantryStaff = ({
   columns,
   refetch,
 }: Props) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedPantryStaff, setSelectedPantryStaff] =
     useState<TPantryStaff | null>(null);
 
   const { deletePantryStaff } = useDeletePantryStaff();
   const { dietCharts } = useGetAllDietCharts();
   const { createMeal } = useCreateMeal();
+
+  const queryClient = useQueryClient();
 
   const handleMealPreparation = async (
     pantryStaffId: string,
@@ -80,16 +84,17 @@ export const EntityTablePantryStaff = ({
       status: "Pending",
     };
     await createMeal(formData);
+    await queryClient.refetchQueries({ queryKey: ["meal"] });
   };
 
   const openCreateDialog = () => {
     setSelectedPantryStaff(null);
-    setIsDialogOpen(true);
+    setIsCreateDialogOpen(true);
   };
 
   const openEditDialog = (pantryStaff: TPantryStaff) => {
     setSelectedPantryStaff(pantryStaff);
-    setIsDialogOpen(true);
+    setIsEditDialogOpen(true);
   };
 
   const handleDeletePantryStaff = async (pantryStaffId: string) => {
@@ -102,10 +107,15 @@ export const EntityTablePantryStaff = ({
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle className="capitalize">{entityType}</CardTitle>
-          <CardDescription>Manage {entityType} records</CardDescription>
+          <CardDescription className="mt-2">
+            Manage {entityType} records
+          </CardDescription>
         </div>
         <div className="relative">
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={isCreateDialogOpen}
+            onOpenChange={setIsCreateDialogOpen}
+          >
             <DialogTrigger asChild>
               <Button
                 onClick={openCreateDialog}
@@ -118,7 +128,7 @@ export const EntityTablePantryStaff = ({
             <PantryStaffForm
               entityType={entityType}
               refetch={refetch}
-              setIsDialogOpen={setIsDialogOpen}
+              setIsDialogOpen={setIsCreateDialogOpen}
             />
           </Dialog>
         </div>
@@ -147,7 +157,10 @@ export const EntityTablePantryStaff = ({
                   </TableCell>
                 ))}
                 <TableCell className="space-y-2">
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <Dialog
+                    open={isEditDialogOpen}
+                    onOpenChange={setIsEditDialogOpen}
+                  >
                     <DialogTrigger asChild>
                       <Button
                         variant="outline"
@@ -163,7 +176,7 @@ export const EntityTablePantryStaff = ({
                         entityType={entityType}
                         refetch={refetch}
                         selectedStaff={selectedPantryStaff}
-                        setIsDialogOpen={setIsDialogOpen}
+                        setIsDialogOpen={setIsEditDialogOpen}
                       />
                     )}
                   </Dialog>
@@ -181,7 +194,7 @@ export const EntityTablePantryStaff = ({
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline">
                           <ChefHat className="w-4 h-4" />
-                          <span>Assign Patient's Diet</span>
+                          <span>Assign Patient's Meal</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="overflow-auto">

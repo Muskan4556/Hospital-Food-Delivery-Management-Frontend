@@ -13,51 +13,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
-import { Edit, Trash2, Plus } from "lucide-react";
-import { TDietChart } from "@/types";
+import { TDeliveryStaff } from "@/types";
 import { useState } from "react";
-import { useDeleteDietChart } from "@/api/diet-chart";
-import { DietChartForm } from "./DietChartForm";
+import { Dialog, DialogTrigger } from "./ui/dialog";
+import { Edit, Plus, Trash2 } from "lucide-react";
+import { DeliveryStaffForm } from "./DeliveryStaffForm";
+import { useDeleteDeliveryStaff } from "@/api/delivery-staff";
 
 const columnRenderers = {
-  "Patient Name": (item: TDietChart) => item.patientId.name || "N/A",
-  "Morning Meal": (item: TDietChart) => item.morningMeal || "N/A",
-  "Evening Meal": (item: TDietChart) => item.eveningMeal || "N/A",
-  "Night Meal": (item: TDietChart) => item.nightMeal || "N/A",
-  Ingredients: (item: TDietChart) =>
-    item.ingredients && item.ingredients.length > 0 ? (
-      <>
-        {item.ingredients.map((i, index) => (
-          <div key={index}>
-            {i.ingredient} ({i.quantity})
-          </div>
-        ))}
-      </>
-    ) : (
-      "No Ingredients"
-    ),
-  Instructions: (item: TDietChart) =>
-    item.instructions && item.instructions.length > 0 ? (
-      <>
-        {item.instructions.map((instruction, index) => (
-          <div key={index}>{instruction}</div>
-        ))}
-      </>
-    ) : (
-      "No Instructions"
-    ),
+  Name: (item: TDeliveryStaff) => item.name || "N/A",
+  "Contact Info": (item: TDeliveryStaff) => (
+    <div className="space-y-2">
+      <div>{item.contactInfo?.email || "N/A"}</div>
+      <div>{item.contactInfo?.phone || "N/A"}</div>
+    </div>
+  ),
 };
 
 type Props = {
   entityType: string;
-  data: TDietChart[];
+  data: TDeliveryStaff[];
   columns: string[];
   refetch: () => void;
 };
 
-export const EntityTableDietChart = ({
+export const EntityTableDeliveryStaff = ({
   entityType,
   data,
   columns,
@@ -65,23 +46,23 @@ export const EntityTableDietChart = ({
 }: Props) => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedDietChart, setSelectedDietChart] = useState<TDietChart | null>(
-    null
-  );
-  const { deleteDietChart } = useDeleteDietChart();
+  const [selectedDeliveryStaff, setSelectedDeliveryStaff] =
+    useState<TDeliveryStaff | null>(null);
+
+  const { deleteDeliveryStaff } = useDeleteDeliveryStaff();
 
   const openCreateDialog = () => {
-    setSelectedDietChart(null);
+    setSelectedDeliveryStaff(null);
     setIsCreateDialogOpen(true);
   };
 
-  const openEditDialog = (dietChart: TDietChart) => {
-    setSelectedDietChart(dietChart);
+  const openEditDialog = (deliveryStaff: TDeliveryStaff) => {
+    setSelectedDeliveryStaff(deliveryStaff);
     setIsEditDialogOpen(true);
   };
 
-  const handleDeleteDietChart = async (dietChartId: string) => {
-    await deleteDietChart(dietChartId);
+  const handleDeleteDeliveryStaff = async (deliveryStaffId: string) => {
+    await deleteDeliveryStaff(deliveryStaffId);
     refetch();
   };
 
@@ -108,7 +89,7 @@ export const EntityTableDietChart = ({
                 <span>Add {entityType}</span>
               </Button>
             </DialogTrigger>
-            <DietChartForm
+            <DeliveryStaffForm
               entityType={entityType}
               refetch={refetch}
               setIsDialogOpen={setIsCreateDialogOpen}
@@ -128,8 +109,8 @@ export const EntityTableDietChart = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((item: TDietChart) => (
-              <TableRow key={item.patientId._id}>
+            {data.map((item: TDeliveryStaff) => (
+              <TableRow key={item._id}>
                 {columns.map((column: string) => (
                   <TableCell key={column}>
                     {columnRenderers[column as keyof typeof columnRenderers]
@@ -154,18 +135,20 @@ export const EntityTableDietChart = ({
                         <span>Edit</span>
                       </Button>
                     </DialogTrigger>
-                    {selectedDietChart && (
-                      <DietChartForm
+                    {selectedDeliveryStaff && (
+                      <DeliveryStaffForm
                         entityType={entityType}
                         refetch={refetch}
-                        selectedDiet={selectedDietChart}
+                        selectedStaff={selectedDeliveryStaff}
                         setIsDialogOpen={setIsEditDialogOpen}
                       />
                     )}
                   </Dialog>
 
                   <Button
-                    onClick={() => handleDeleteDietChart(item._id as string)}
+                    onClick={() =>
+                      handleDeleteDeliveryStaff(item._id as string)
+                    }
                     variant="outline"
                     className="hover:bg-red-600 hover:text-white"
                   >

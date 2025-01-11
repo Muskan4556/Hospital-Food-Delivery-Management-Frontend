@@ -59,3 +59,74 @@ export type TMealPreparation = {
   patientId: string;
   status: "Pending" | "In Progress" | "Completed";
 };
+
+export type TMeal = {
+  _id: string;
+  createdAt: string;
+  status: "Pending" | "In Progress" | "Completed";
+  pantryStaffId: {
+    _id: string;
+    name: string;
+    contactInfo?: {
+      phone?: string;
+    };
+  };
+  dietChartId: {
+    _id: string;
+    morningMeal: string;
+    eveningMeal: string;
+    nightMeal: string;
+    instructions: string[];
+  };
+  patientId: {
+    _id: string;
+    name: string;
+    age: number;
+  };
+};
+
+export type TDeliveryStaff = {
+  _id?: string;
+  name: string;
+  contactInfo: {
+    phone?: string;
+    email?: string;
+  };
+};
+
+export type TDeliveryAssign = {
+  _id?: string;
+  deliveryPersonnelId: string;
+  mealPreparationId: string;
+  patientId: string;
+  deliveryTime: Date;
+};
+
+export type TDelivery = {
+  _id: string;
+  createdAt: string;
+  deliveryPersonnelId: {
+    _id: string;
+    name: string;
+    contactInfo?: {
+      phone?: string;
+    };
+  };
+  mealPreparationId: {
+    _id: string;
+    pantryStaffId: {
+      _id: string;
+      name: string;
+      contactInfo?: {
+        phone?: string;
+      };
+    };
+  };
+  patientId: {
+    _id: string;
+    name: string;
+  };
+  status: "Pending" | "Completed";
+  deliveryTime: string;
+  updatedAt: string;
+};

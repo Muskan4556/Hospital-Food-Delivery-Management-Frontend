@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import { Users, Clock, ChefHat, Utensils } from "lucide-react";
+import { Users, Clock, ChefHat, Utensils, Truck, Package } from "lucide-react";
 import { useGetAllPatients } from "@/api/patient";
 import { EntityTable } from "./EntityTable";
 import { useGetAllDietCharts } from "@/api/diet-chart";
@@ -9,22 +8,57 @@ import { EntityTableDietChart } from "./EntityTableDietChart";
 import Loader from "./Loader";
 import { useGetAllPantryStaff } from "@/api/pantry-Staff";
 import { EntityTablePantryStaff } from "./EntityTablePantryStaff";
+import { useGetAllMeal } from "@/api/mealPreparation";
+import { EntityTableMeal } from "./EntityTableMeal";
+import { useGetAllDeliveryStaff } from "@/api/delivery-staff";
+import { EntityTableDeliveryStaff } from "./EntityTableDeliveryStaff";
+import { useGetAllDelivery } from "@/api/deliveryStatus";
+import { EntityTableDelivery } from "./EntityDeliveryStatus";
 
 const Dashboard = () => {
-  const { patients, isLoading, refetch } = useGetAllPatients();
+  const { patients, isLoading, refetch, error } = useGetAllPatients();
   const {
     dietCharts,
     isLoading: isLoadingDiet,
     refetch: refetchDietCharts,
+    error: errorDietCharts,
   } = useGetAllDietCharts();
 
   const {
     pantryStaff,
     isLoading: isLoadingPantryStaff,
     refetch: refetchPantryStaff,
+    error: errorPantryStaff,
   } = useGetAllPantryStaff();
+  const {
+    meals,
+    isLoading: isLoadingMeal,
+    refetch: refetchMeal,
+    error: errorMeal,
+  } = useGetAllMeal();
 
-  if (isLoading || isLoadingDiet || isLoadingPantryStaff) {
+  const {
+    deliveryStaff,
+    isLoading: isLoadingDeliveryStaff,
+    refetch: refetchDeliveryStaff,
+    error: errorDeliveryStaff,
+  } = useGetAllDeliveryStaff();
+
+  const {
+    delivery,
+    isLoading: isLoadingDelivery,
+    refetch: refetchDelivery,
+    error: errorDelivery,
+  } = useGetAllDelivery();
+
+  if (
+    isLoading ||
+    isLoadingDiet ||
+    isLoadingPantryStaff ||
+    isLoadingMeal ||
+    isLoadingDeliveryStaff ||
+    isLoadingDelivery
+  ) {
     return <Loader />;
   }
 
@@ -53,16 +87,31 @@ const Dashboard = () => {
           </TabsTrigger>
           <TabsTrigger value="pantry-staff">
             <Users className="w-4 h-4 mr-2" />
-            Pantry Staff
+            Pantry Team
+          </TabsTrigger>
+          <TabsTrigger value="delivery-personnel">
+            <Truck className="w-4 h-4 mr-2" />
+            Delivery Team
           </TabsTrigger>
           <TabsTrigger value="meals">
             <Utensils className="w-4 h-4 mr-2" />
-            Meals
+            Meal Preparation
+          </TabsTrigger>
+          <TabsTrigger value="delivery-status">
+            <Package className="w-4 h-4 mr-2" />
+            Delivery Progress
           </TabsTrigger>
         </TabsList>
 
-        {patients && (
-          <TabsContent value="patients">
+        <TabsContent value="patients">
+          {isLoading ? (
+            <Loader />
+          ) : error ? (
+            <p className="text-red-500">
+              Failed to load patients:{" "}
+              {error.message || "An unknown error occurred."}
+            </p>
+          ) : patients ? (
             <EntityTable
               entityType="patient"
               refetch={refetch}
@@ -80,11 +129,20 @@ const Dashboard = () => {
                 "Emergency Contact",
               ]}
             />
-          </TabsContent>
-        )}
+          ) : (
+            <p>No patient data available.</p>
+          )}
+        </TabsContent>
 
-        {dietCharts && (
-          <TabsContent value="diet-charts">
+        <TabsContent value="diet-charts">
+          {isLoadingDiet ? (
+            <Loader />
+          ) : errorDietCharts ? (
+            <p className="text-red-500">
+              Failed to load diet charts:{" "}
+              {errorDietCharts.message || "An unknown error occurred."}
+            </p>
+          ) : dietCharts ? (
             <EntityTableDietChart
               entityType="Diet Chart"
               refetch={refetchDietCharts}
@@ -98,18 +156,104 @@ const Dashboard = () => {
                 "Instructions",
               ]}
             />
-          </TabsContent>
-        )}
-        {pantryStaff && (
-          <TabsContent value="pantry-staff">
+          ) : (
+            <p>No diet chart data available.</p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="pantry-staff">
+          {isLoadingPantryStaff ? (
+            <Loader />
+          ) : errorPantryStaff ? (
+            <p className="text-red-500">
+              Failed to load pantry staff:{" "}
+              {errorPantryStaff.message || "An unknown error occurred."}
+            </p>
+          ) : pantryStaff ? (
             <EntityTablePantryStaff
-              entityType="Pantry Staff"
+              entityType="Pantry Team"
               refetch={refetchPantryStaff}
               data={pantryStaff}
               columns={["Name", "Contact Info", "Location"]}
             />
-          </TabsContent>
-        )}
+          ) : (
+            <p>No pantry staff data available.</p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="delivery-personnel">
+          {isLoadingDeliveryStaff ? (
+            <Loader />
+          ) : errorDeliveryStaff ? (
+            <p className="text-red-500">
+              Failed to load delivery team:{" "}
+              {errorDeliveryStaff.message || "An unknown error occurred."}
+            </p>
+          ) : deliveryStaff ? (
+            <EntityTableDeliveryStaff
+              entityType="Delivery Team"
+              refetch={refetchDeliveryStaff}
+              data={deliveryStaff}
+              columns={["Name", "Contact Info"]}
+            />
+          ) : (
+            <p>No delivery team data available.</p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="meals">
+          {isLoadingMeal ? (
+            <Loader />
+          ) : errorMeal ? (
+            <p className="text-red-500">
+              Failed to load meals:{" "}
+              {errorMeal.message || "An unknown error occurred."}
+            </p>
+          ) : meals ? (
+            <EntityTableMeal
+              entityType="Meals"
+              refetch={refetchMeal}
+              data={meals}
+              columns={[
+                "Patient Name",
+                "Assigned Pantry Staff",
+                "Diet Plan",
+                "Status",
+                "Assigned On",
+                "Instructions",
+              ]}
+            />
+          ) : (
+            <p>No meal data available.</p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="delivery-status">
+          {isLoadingDelivery ? (
+            <Loader />
+          ) : errorDelivery ? (
+            <p className="text-red-500">
+              Failed to load delivery status:{" "}
+              {errorDelivery.message || "An unknown error occurred."}
+            </p>
+          ) : delivery ? (
+            <EntityTableDelivery
+              entityType="Deliveries"
+              refetch={refetchDelivery}
+              data={delivery}
+              columns={[
+                "Patient Name",
+                "Assigned Pantry Staff",
+                "Assigned Delivery Personnel",
+                "Status",
+                "Assigned On",
+                "Delivery Time"
+              ]}
+            />
+          ) : (
+            <p>No delivery status data available.</p>
+          )}
+        </TabsContent>
       </Tabs>
     </div>
   );

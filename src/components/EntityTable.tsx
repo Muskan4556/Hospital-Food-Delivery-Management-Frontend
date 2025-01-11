@@ -46,18 +46,19 @@ const columnRenderers = {
 };
 
 export const EntityTable = ({ entityType, data, columns, refetch }: Props) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<TPatient | null>(null);
   const { deletePatient } = useDeletePatient();
 
   const openCreateDialog = () => {
     setSelectedPatient(null);
-    setIsDialogOpen(true);
+    setIsCreateDialogOpen(true);
   };
 
   const openEditDialog = (patient: TPatient) => {
     setSelectedPatient(patient);
-    setIsDialogOpen(true);
+    setIsEditDialogOpen(true);
   };
 
   const handleDeletPatient = async (patientId: string) => {
@@ -70,10 +71,15 @@ export const EntityTable = ({ entityType, data, columns, refetch }: Props) => {
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle className="capitalize">{entityType}</CardTitle>
-          <CardDescription>Manage {entityType} records</CardDescription>
+          <CardDescription className="mt-2">
+            Manage {entityType} records
+          </CardDescription>
         </div>
         <div className="relative">
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={isCreateDialogOpen}
+            onOpenChange={setIsCreateDialogOpen}
+          >
             <DialogTrigger asChild>
               <Button
                 onClick={openCreateDialog}
@@ -86,7 +92,7 @@ export const EntityTable = ({ entityType, data, columns, refetch }: Props) => {
             <PatientForm
               entityType={entityType}
               refetch={refetch}
-              setIsDialogOpen={setIsDialogOpen}
+              setIsDialogOpen={setIsCreateDialogOpen}
             />
           </Dialog>
         </div>
@@ -95,7 +101,7 @@ export const EntityTable = ({ entityType, data, columns, refetch }: Props) => {
       <CardContent>
         <Table>
           <TableHeader>
-          <TableRow>
+            <TableRow>
               {columns.map((column: string) => (
                 <TableHead key={column}>{column}</TableHead>
               ))}
@@ -115,7 +121,10 @@ export const EntityTable = ({ entityType, data, columns, refetch }: Props) => {
                   </TableCell>
                 ))}
                 <TableCell className="space-y-2">
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <Dialog
+                    open={isEditDialogOpen}
+                    onOpenChange={setIsEditDialogOpen}
+                  >
                     <DialogTrigger asChild>
                       <Button
                         variant={"outline"}
@@ -131,7 +140,7 @@ export const EntityTable = ({ entityType, data, columns, refetch }: Props) => {
                       refetch={refetch}
                       // @ts-expect-error: Expect an error on the next line
                       selectedPatient={selectedPatient}
-                      setIsDialogOpen={setIsDialogOpen}
+                      setIsDialogOpen={setIsEditDialogOpen}
                     />
                   </Dialog>
 

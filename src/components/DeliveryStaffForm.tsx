@@ -17,53 +17,50 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useEffect } from "react";
-import { useCreatePantryStaff, useUpdatePantryStaff } from "@/api/pantry-Staff";
-import { TPantryStaff } from "@/types";
+import { useCreateDeliveryStaff, useUpdateDeliveryStaff } from "@/api/delivery-staff";
+import { TDeliveryStaff } from "@/types";
 
-type PantryStaffFormProps = {
+type DeliveryStaffFormProps = {
   entityType: string;
   refetch: () => void;
   setIsDialogOpen: (open: boolean) => void;
-  selectedStaff?: TPantryStaff;
+  selectedStaff?: TDeliveryStaff;
 };
 
-const pantryStaffSchema = z.object({
+const deliveryStaffSchema = z.object({
   name: z.string().min(1, "Name is required"),
   contactInfo: z.object({
     phone: z.string().optional(),
     email: z.string().email("Invalid email format").optional(),
   }),
-  location: z.string().min(1, "Location is required"),
 });
 
-type PantryStaffFormData = z.infer<typeof pantryStaffSchema>;
+type DeliveryStaffFormData = z.infer<typeof deliveryStaffSchema>;
 
-export const PantryStaffForm = ({
+export const DeliveryStaffForm = ({
   entityType,
   refetch,
   selectedStaff,
   setIsDialogOpen,
-}: PantryStaffFormProps) => {
-  const { createPantryStaff } = useCreatePantryStaff();
-  const { updatePantryStaff } = useUpdatePantryStaff();
+}: DeliveryStaffFormProps) => {
+  const { createDeliveryStaff } = useCreateDeliveryStaff();
+  const { updateDeliveryStaff } = useUpdateDeliveryStaff();
 
-  const defaultValues: PantryStaffFormData = selectedStaff
+  const defaultValues: DeliveryStaffFormData = selectedStaff
     ? {
         name: selectedStaff.name,
         contactInfo: {
           phone: selectedStaff.contactInfo.phone || "",
           email: selectedStaff.contactInfo.email || "",
         },
-        location: selectedStaff.location,
       }
     : {
         name: "",
         contactInfo: { phone: "", email: "" },
-        location: "",
       };
 
-  const form = useForm<PantryStaffFormData>({
-    resolver: zodResolver(pantryStaffSchema),
+  const form = useForm<DeliveryStaffFormData>({
+    resolver: zodResolver(deliveryStaffSchema),
     defaultValues,
   });
 
@@ -75,27 +72,25 @@ export const PantryStaffForm = ({
           phone: selectedStaff.contactInfo.phone || "",
           email: selectedStaff.contactInfo.email || "",
         },
-        location: selectedStaff.location,
       });
     } else {
       form.reset({
         name: "",
         contactInfo: { phone: "", email: "" },
-        location: "",
       });
     }
   }, [selectedStaff, form]);
 
-  const onSubmit = async (data: PantryStaffFormData) => {
+  const onSubmit = async (data: DeliveryStaffFormData) => {
     if (selectedStaff && selectedStaff._id) {
-      await updatePantryStaff({
-        pantryStaffId: selectedStaff._id,
+      await updateDeliveryStaff({
+        deliveryStaffId: selectedStaff._id,
         formData: data,
       });
       setIsDialogOpen(false);
       refetch();
     } else {
-      await createPantryStaff(data);
+      await createDeliveryStaff(data);
       setIsDialogOpen(false);
       refetch();
     }
@@ -148,19 +143,6 @@ export const PantryStaffForm = ({
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Location</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter location" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <div className="flex justify-end space-x-4">
             <Button type="submit">Submit</Button>
           </div>

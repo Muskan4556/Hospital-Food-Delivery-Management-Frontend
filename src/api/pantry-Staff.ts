@@ -1,5 +1,5 @@
 import { TPantryStaff } from "@/types";
-import {  useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -114,7 +114,7 @@ export const useDeletePantryStaff = () => {
   return { deletePantryStaff, status, error };
 };
 
-export const useUpdatePantryStaff= () => {
+export const useUpdatePantryStaff = () => {
   const updatePantryStaffRequest = async (data: {
     pantryStaffId: string;
     formData: TPantryStaff;
