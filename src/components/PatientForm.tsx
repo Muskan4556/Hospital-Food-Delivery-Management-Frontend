@@ -165,9 +165,8 @@ export const PatientForm = ({
       ...data,
       dob: new Date(data.dob),
     };
-    if (selectedPatient) {
+    if (selectedPatient && selectedPatient._id) {
       await updatePatient({
-        // @ts-expect-error: Expect an error on the next line
         patientId: selectedPatient._id,
         formData: formattedData,
       });
@@ -298,7 +297,6 @@ export const PatientForm = ({
             />
           </div>
 
-          {/* Contact Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -328,7 +326,6 @@ export const PatientForm = ({
             />
           </div>
 
-          {/* Diseases */}
           <div className="space-y-4">
             <FormLabel className="font-semibold">Diseases</FormLabel>
             {diseaseFields.map((field, index) => (
@@ -367,7 +364,6 @@ export const PatientForm = ({
             </Button>
           </div>
 
-          {/* Allergies */}
           <div className="space-y-4">
             <FormLabel className="font-semibold">Allergies</FormLabel>
             {allergyFields.map((field, index) => (
@@ -406,14 +402,12 @@ export const PatientForm = ({
             </Button>
           </div>
 
-          {/* Emergency Contacts */}
           <div className="space-y-4">
             <FormLabel className="font-semibold">Emergency Contacts</FormLabel>
 
             {emergencyFields.map((field, index) => (
               <div key={field.id} className="space-y-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Contact Name */}
                   <FormField
                     control={form.control}
                     name={`emergencyContact.${index}.name`}
@@ -427,8 +421,6 @@ export const PatientForm = ({
                       </FormItem>
                     )}
                   />
-
-                  {/* Contact Phone */}
                   <FormField
                     control={form.control}
                     name={`emergencyContact.${index}.phone`}
@@ -443,8 +435,6 @@ export const PatientForm = ({
                     )}
                   />
                 </div>
-
-                {/* Remove Button */}
                 {emergencyFields.length > 1 && (
                   <Button
                     type="button"
@@ -459,7 +449,6 @@ export const PatientForm = ({
               </div>
             ))}
 
-            {/* Add Emergency Contact Button */}
             <Button
               type="button"
               variant="outline"
@@ -471,7 +460,6 @@ export const PatientForm = ({
             </Button>
           </div>
 
-          {/* Submit */}
           <Button type="submit" className="w-full">
             Submit
           </Button>

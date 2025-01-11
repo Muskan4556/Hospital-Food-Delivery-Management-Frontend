@@ -13,13 +13,37 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { Button } from "./ui/button";
-import { TPantryStaff } from "@/types";
+import { TMealPreparation, TPantryStaff } from "@/types";
+import { useState } from "react";
+import { useDeletePantryStaff } from "@/api/pantry-Staff";
+import { Dialog, DialogTrigger } from "./ui/dialog";
+import { ChefHat, Edit, Plus, Trash2 } from "lucide-react";
+import { PantryStaffForm } from "./PantryStaffForm";
+import { useGetAllDietCharts } from "@/api/diet-chart";
+import { useCreateMeal } from "@/api/mealPreparation";
 
 const columnRenderers = {
-  "Staff Name": (item: TPantryStaff) => item.name || "N/A",
-  Phone: (item: TPantryStaff) => item.contactInfo?.phone || "N/A",
-  Email: (item: TPantryStaff) => item.contactInfo?.email || "N/A",
+  Name: (item: TPantryStaff) => item.name || "N/A",
+  "Contact Info": (item: TPantryStaff) => (
+    <div>
+      <div>{item.contactInfo?.phone || "N/A"}</div>
+      <div>{item.contactInfo?.email || "N/A"}</div>
+    </div>
+  ),
   Location: (item: TPantryStaff) => item.location || "N/A",
 };
 
@@ -34,7 +58,44 @@ export const EntityTablePantryStaff = ({
   entityType,
   data,
   columns,
+  refetch,
 }: Props) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedPantryStaff, setSelectedPantryStaff] =
+    useState<TPantryStaff | null>(null);
+
+  const { deletePantryStaff } = useDeletePantryStaff();
+  const { dietCharts } = useGetAllDietCharts();
+  const { createMeal } = useCreateMeal();
+
+  const handleMealPreparation = async (
+    pantryStaffId: string,
+    dietChartId: string,
+    patientId: string
+  ) => {
+    const formData: TMealPreparation = {
+      pantryStaffId,
+      dietChartId,
+      patientId,
+      status: "Pending",
+    };
+    await createMeal(formData);
+  };
+
+  const openCreateDialog = () => {
+    setSelectedPantryStaff(null);
+    setIsDialogOpen(true);
+  };
+
+  const openEditDialog = (pantryStaff: TPantryStaff) => {
+    setSelectedPantryStaff(pantryStaff);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeletePantryStaff = async (pantryStaffId: string) => {
+    await deletePantryStaff(pantryStaffId);
+    refetch();
+  };
 
   return (
     <Card>
@@ -44,7 +105,22 @@ export const EntityTablePantryStaff = ({
           <CardDescription>Manage {entityType} records</CardDescription>
         </div>
         <div className="relative">
-          
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                onClick={openCreateDialog}
+                className="flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add {entityType}</span>
+              </Button>
+            </DialogTrigger>
+            <PantryStaffForm
+              entityType={entityType}
+              refetch={refetch}
+              setIsDialogOpen={setIsDialogOpen}
+            />
+          </Dialog>
         </div>
       </CardHeader>
 
@@ -60,7 +136,7 @@ export const EntityTablePantryStaff = ({
           </TableHeader>
           <TableBody>
             {data.map((item: TPantryStaff) => (
-              <TableRow key={item.name}>
+              <TableRow key={item._id}>
                 {columns.map((column: string) => (
                   <TableCell key={column}>
                     {columnRenderers[column as keyof typeof columnRenderers]
@@ -70,8 +146,110 @@ export const EntityTablePantryStaff = ({
                       : ""}
                   </TableCell>
                 ))}
-                <TableCell>
-                    <Button variant={"outline"}>Assign Meal</Button>
+                <TableCell className="space-y-2">
+                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        onClick={() => openEditDialog(item)}
+                        className="flex items-center space-x-2"
+                      >
+                        <Edit className="w-4 h-4" />
+                        <span>Edit</span>
+                      </Button>
+                    </DialogTrigger>
+                    {selectedPantryStaff && (
+                      <PantryStaffForm
+                        entityType={entityType}
+                        refetch={refetch}
+                        selectedStaff={selectedPantryStaff}
+                        setIsDialogOpen={setIsDialogOpen}
+                      />
+                    )}
+                  </Dialog>
+
+                  <Button
+                    onClick={() => handleDeletePantryStaff(item._id as string)}
+                    variant="outline"
+                    className="hover:bg-red-600 hover:text-white"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete</span>
+                  </Button>
+                  <div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline">
+                          <ChefHat className="w-4 h-4" />
+                          <span>Assign Patient's Diet</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="overflow-auto">
+                        <DropdownMenuLabel>
+                          Select diet chart for
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {dietCharts &&
+                          dietCharts.map((diet) => (
+                            <DropdownMenuSub key={diet._id}>
+                              <DropdownMenuSubTrigger
+                                onClick={() =>
+                                  handleMealPreparation(
+                                    item._id as string,
+                                    diet._id as string,
+                                    diet.patientId._id as string
+                                  )
+                                }
+                              >
+                                <div className="flex flex-col cursor-pointer">
+                                  <div className="font-bold">
+                                    {diet.patientId.name}
+                                  </div>
+                                  {diet?.patientId?.diseases && (
+                                    <div className="text-sm text-gray-500">
+                                      <span className="font-bold">
+                                        Diseases:
+                                      </span>{" "}
+                                      {diet?.patientId?.diseases?.join(", ")}
+                                    </div>
+                                  )}
+                                  {diet?.patientId?.allergies && (
+                                    <div className="text-sm text-red-500">
+                                      <span className="font-bold">
+                                        Allergies:
+                                      </span>{" "}
+                                      {diet?.patientId?.allergies?.join(", ")}
+                                    </div>
+                                  )}
+                                </div>
+                              </DropdownMenuSubTrigger>
+                              <DropdownMenuPortal>
+                                <DropdownMenuSubContent>
+                                  <DropdownMenuItem>
+                                    <span className="font-bold">
+                                      Morning Meal:
+                                    </span>{" "}
+                                    {diet.morningMeal}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem>
+                                    <span className="font-bold">
+                                      Evening Meal:
+                                    </span>{" "}
+                                    {diet.eveningMeal}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem>
+                                    <span className="font-bold">
+                                      Night Meal:
+                                    </span>{" "}
+                                    {diet.nightMeal}
+                                  </DropdownMenuItem>
+                                </DropdownMenuSubContent>
+                              </DropdownMenuPortal>
+                            </DropdownMenuSub>
+                          ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

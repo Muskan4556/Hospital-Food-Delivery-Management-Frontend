@@ -23,7 +23,14 @@ export type TPatient = {
 
 export type TDietChart = {
   _id?: string;
-  patientId: string;
+  patientId: {
+    _id: string;
+    name?: string;
+    diseases?: string[];
+    allergies?: string[];
+    age?: number;
+    gender?: "Male" | "Female" | "Other";
+  };
   morningMeal: string;
   eveningMeal: string;
   nightMeal: string;
@@ -36,11 +43,19 @@ export type TDietChart = {
   updatedAt?: string;
 };
 
-export type TPantryStaff= {
+export type TPantryStaff = {
+  _id?: string;
   name: string;
   contactInfo: {
     phone?: string;
     email?: string;
   };
   location: string;
+};
+
+export type TMealPreparation = {
+  pantryStaffId: string;
+  dietChartId: string;
+  patientId: string;
+  status: "Pending" | "In Progress" | "Completed";
 };

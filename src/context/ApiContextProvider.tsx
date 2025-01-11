@@ -36,7 +36,7 @@ export const AppContextProvider = ({ children }: ContextProviderProps) => {
       setUserRole(data.userRole);
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userRole", data.userRole);
-      setLoading(false); // Set loading to false after successful validation
+      setLoading(false); 
     },
     onError: () => {
       setIsLoggedIn(false);

@@ -22,9 +22,6 @@ import { useDeleteDietChart } from "@/api/diet-chart";
 import { DietChartForm } from "./DietChartForm";
 
 const columnRenderers = {
-  // @ts-expect-error: Expect an error on the next line
-  "Patient Id": (item: TDietChart) => item.patientId._id.toString() || "N/A",
-  // @ts-expect-error: Expect an error on the next line
   "Patient Name": (item: TDietChart) => item.patientId.name || "N/A",
   "Morning Meal": (item: TDietChart) => item.morningMeal || "N/A",
   "Evening Meal": (item: TDietChart) => item.eveningMeal || "N/A",
@@ -114,7 +111,7 @@ export const EntityTableDietChart = ({
           </TableHeader>
           <TableBody>
             {data.map((item: TDietChart) => (
-              <TableRow key={item.patientId}>
+              <TableRow key={item.patientId._id}>
                 {columns.map((column: string) => (
                   <TableCell key={column}>
                     {columnRenderers[column as keyof typeof columnRenderers]
@@ -136,18 +133,18 @@ export const EntityTableDietChart = ({
                         <span>Edit</span>
                       </Button>
                     </DialogTrigger>
-                    <DietChartForm
-                      entityType={entityType}
-                      refetch={refetch}
-                      // @ts-expect-error: Expect an error on the next line
-                      selectedDiet={selectedDietChart}
-                      setIsDialogOpen={setIsDialogOpen}
-                    />
+                    {selectedDietChart && (
+                      <DietChartForm
+                        entityType={entityType}
+                        refetch={refetch}
+                        selectedDiet={selectedDietChart}
+                        setIsDialogOpen={setIsDialogOpen}
+                      />
+                    )}
                   </Dialog>
 
                   <Button
-                    // @ts-expect-error: Expect an error on the next line
-                    onClick={() => handleDeleteDietChart(item._id)}
+                    onClick={() => handleDeleteDietChart(item._id as string)}
                     variant="outline"
                     className="hover:bg-red-600 hover:text-white"
                   >

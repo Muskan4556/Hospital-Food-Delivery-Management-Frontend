@@ -57,7 +57,7 @@ export const DietChartForm = ({
 
   const defaultValues = selectedDiet
     ? {
-        patientId: selectedDiet.patientId.toString(),
+        patientId: selectedDiet.patientId._id.toString(),
         morningMeal: selectedDiet.morningMeal,
         eveningMeal: selectedDiet.eveningMeal,
         nightMeal: selectedDiet.nightMeal,
@@ -81,7 +81,7 @@ export const DietChartForm = ({
   useEffect(() => {
     if (selectedDiet) {
       form.reset({
-        patientId: selectedDiet.patientId,
+        patientId: selectedDiet.patientId._id.toString(),
         morningMeal: selectedDiet.morningMeal,
         eveningMeal: selectedDiet.eveningMeal,
         nightMeal: selectedDiet.nightMeal,
@@ -119,16 +119,20 @@ export const DietChartForm = ({
   });
 
   const onSubmit = async (data: DietFormData) => {
-    if (selectedDiet) {
+    const { patientId, ...rest } = data;
+    const formattedData = {
+      ...rest,
+      patientId: { _id: patientId },
+    };
+    if (selectedDiet && selectedDiet._id) {
       await updateDietChart({
-        // @ts-expect-error: Expect an error on the next line
         dietChartId: selectedDiet._id,
-        formData: data,
+        formData: formattedData,
       });
       setIsDialogOpen(false);
       refetch();
     } else {
-      await createDietChart(data);
+      await createDietChart(formattedData);
       setIsDialogOpen(false);
       refetch();
     }

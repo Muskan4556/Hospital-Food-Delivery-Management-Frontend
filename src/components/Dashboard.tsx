@@ -41,8 +41,8 @@ const Dashboard = () => {
         </Badge>
       </div>
 
-      <Tabs defaultValue="diet-charts" className="space-y-4 px-">
-        <TabsList>
+      <Tabs defaultValue="diet-charts" className="space-y-4 ">
+        <TabsList className="flex-col flex-wrap overflow-auto">
           <TabsTrigger value="patients">
             <Users className="w-4 h-4 mr-2" />
             Patients
@@ -90,7 +90,6 @@ const Dashboard = () => {
               refetch={refetchDietCharts}
               data={dietCharts}
               columns={[
-                "Patient Id",
                 "Patient Name",
                 "Morning Meal",
                 "Evening Meal",
@@ -107,7 +106,7 @@ const Dashboard = () => {
               entityType="Pantry Staff"
               refetch={refetchPantryStaff}
               data={pantryStaff}
-              columns={["Staff Name", "Phone", "Email", "Location"]}
+              columns={["Name", "Contact Info", "Location"]}
             />
           </TabsContent>
         )}
